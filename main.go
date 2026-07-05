@@ -22,6 +22,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"sync"
 
 	"cloud.google.com/go/logging"
 	"example.com/micro/metadata"
@@ -35,6 +36,8 @@ type App struct {
 	*http.Server
 	projectID string
 	log       *logging.Logger
+	mu    	sync.Mutex
+    count int
 }
 
 func main() {
@@ -106,6 +109,10 @@ func newApp(ctx context.Context, port, projectID string) (*App, error) {
 	r := mux.NewRouter()
 	r.HandleFunc("/", app.Handler).
 		Methods("GET")
+	app.Server.Handler = r
+	
+	r.HandleFunc("/count", app.CountHandler).
+		Methods("POST")
 	app.Server.Handler = r
 
 	return app, nil

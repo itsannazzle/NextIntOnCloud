@@ -30,5 +30,19 @@ func (a *App) Handler(w http.ResponseWriter, r *http.Request) {
 		Labels:  map[string]string{"arbitraryField": "custom entry"},
 		Payload: "Structured logging example.",
 	})
-	fmt.Fprintf(w, "Hello World!\n")
+	fmt.Fprintf(w, "My first cloud run ever, build with Go\n")	
+}
+
+func (a *App) CountHandler(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    a.mu.Lock()
+    defer a.mu.Unlock()
+
+    a.count++
+
+    fmt.Fprintf(w, "Current count: %d\n", a.count)
 }
